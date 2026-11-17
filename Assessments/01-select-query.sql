@@ -1475,6 +1475,10 @@ ORDER BY order_date DESC;
 #==================================================== Section D — AI-Augmented Learning ======================================================================
 #=============================================================================================================================================================
 
+#=============================================================================================================================================================
+#==================================================== Section D — AI-Augmented Learning ======================================================================
+#=============================================================================================================================================================
+
 /*
 STEP 1 · BUILD WITH AI
 Use an AI tool of your choice (ChatGPT, Claude, GitHub Copilot, etc.) to help you write a SQL query
@@ -1490,7 +1494,50 @@ Then, working without AI, test the query against your own schema. Find at least 
 error, or edge-case gap in the AI's solution — common issues include: applying the
 HAVING/WHERE filter after ranking instead of before (causing wrong ranks), using the wrong
 PARTITION BY column, or failing to handle NULL delivery times. Fix it yourself.
-
-
-
 */
+
+select * from restaurants_2;
+select * from orders_2;
+select * from customers_2;
+select * from delivery_agents_2;
+
+with cte_agents_stats as (
+select
+	da.agent_id,
+    da.agent_name,
+    da.city,
+    count(o.order_id)as total_orders,
+    round(avg(o.delivery_time_mins),2)as avg_delivery_time
+    from delivery_agents_2 as da
+    inner join orders_2 as o
+    on da.agent_id = o.agent_id
+    where o.order_status = "Delivered"
+    group by 
+    da.agent_id,
+    da.agent_name,
+    da.city
+    having total_orders >= 2 # I am using 2 in place of 5 orders
+),cte_agent_ranking as (
+	select
+	agent_id,
+    agent_name,
+    city,
+    total_orders,
+    avg_delivery_time,
+    dense_rank()over(partition by city order by avg_delivery_time desc )as agent_rank
+    from cte_agents_stats
+)
+select 
+	agent_id,
+    agent_name,
+    city,
+    total_orders,
+    avg_delivery_time,
+    agent_rank
+    from cte_agent_ranking
+     where agent_rank <= 3
+     order by city asc, agent_rank asc;
+    
+    
+
+
