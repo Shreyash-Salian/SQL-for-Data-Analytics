@@ -1,7 +1,7 @@
 
-#=============================== Module 4 – SQL for Data Analytics =============================================================
-#=============================== Section A — Concept Application ===============================================================
-#=============================== Session - 01 ==================================================================================
+#=============================== Module 4 – SQL for Data Analytics===========================================================
+#============================= Section A — Concept Application=======================================
+#============================= Session - 01==========================================================
 /*
 SCENARIO
 You are a data analyst at a food delivery platform. The operations team needs a report
@@ -227,9 +227,7 @@ GROUP BY restaurant_id;
 
 
 /*
-#=====================================================================================================================================================
-=================================================================SCENARIO 2===========================================================================
-#=====================================================================================================================================================
+=================================================================SCENARIO 2==============================================================================================
 SCENARIO:
 You are building a customer insights report for a food delivery app. The marketing team
 needs a list of every registered customer and their most recent order details — even for
@@ -330,10 +328,9 @@ I will select LEFT JOIN because the customers table is my primary table, and I n
 every registered customer in the report. LEFT JOIN preserves all customer records and returns NULL for order details when no matching order exists. 
 If I used INNER JOIN, customers who have never placed an order would be excluded, resulting in incomplete customer insights
 */
-#=============================================================================================================================================================
+
 #======================================================== SCENARIO - 3 ========================================================================================
-#==============================================================================================================================================================
-  /*
+/*
 SCENARIO
 You are designing a delivery performance dashboard. The business wants to identify
 delivery agents whose average delivery time is faster than the overall platform average,
@@ -465,9 +462,8 @@ SELECT
     ) AS platform_avg_time
 */
 
-#===========================================================================================================================================================
-#==================================================== SCENARIO - 4 ==========================================================================================
-#============================================================================================================================================================
+#=========================================================================================================================
+#=============================== SCENARIO - 4 ===========================================================================
 /*
 SCENARIO:-
 You are analysing order data for a food delivery company. The product team wants to
@@ -551,9 +547,8 @@ Use DENSE_RANK() if the product team wants the top three revenue levels while in
 Use RANK() if the report should follow competition-style ranking.
 */
 
-#======================================================================================================================================
-#=============================================== SCENARIO - 5 =========================================================================
-#=======================================================================================================================================  
+#=========================================================================================================================
+#=============================== SCENARIO - 5 ===========================================================================
 /*
 SCENARIO
 You are writing a CRM query for a food delivery startup. The customer success team
@@ -630,9 +625,8 @@ select
     group by c.customer_id,c.customer_name;
     
     
-#=========================================================================================================================================================
-#======================================== SCENARIO 6 ====================================================================================================
 #========================================================================================================================================================
+#======================================== SCENARIO 6======================================================================================================
 /*
 SCENARIO
 You are optimising a slow-running analytics query for a food delivery platform. The
@@ -936,7 +930,7 @@ from delivery_orders group by restaurant_name
 having total_revenue > 5000;
 
 #===============================================================================================================================================
-#============================= Task 3: Customer–Order–Restaurant Joined Report ===================================================================
+#============================= Task 3: Customer–Order–Restaurant Joined Report===================================================================
 #================================================================================================================================================
 /*
 Write JOIN queries across three related tables — customers, restaurants, and orders — to
@@ -1187,4 +1181,309 @@ select
         else  "Needs Improvement"
 	end as performance_status
 from cte_ranked_agent;
+
+#=================================================================================================================================================================================
+#================================================= Section C — Mini Capstone Project =============================================================================================
+#================================================= Mini Project: Food Delivery Analytics — SQL Backend ===========================================================================
+
+/*
+Objective:
+Build a complete SQL backend for a food delivery analytics system by designing a multi-table
+schema and writing a suite of queries that combines JOINs, aggregations, window functions,
+CASE WHEN classification, CTEs, and a saved View to answer real business questions.
+*/
+use assignmentpractice;
+/*
+-  Design a schema with at least four related tables: customers, restaurants, orders, and
+delivery_agents. Define appropriate PRIMARY KEY and FOREIGN KEY constraints and insert at
+least 10 rows per table with realistic food delivery data across at least 3 cities.
+*/
+
+drop table if exists customers_2;
+CREATE TABLE customers_2 (
+    customer_id INT PRIMARY KEY,
+    customer_name VARCHAR(100) NOT NULL,
+    city VARCHAR(50),
+    phone VARCHAR(15),
+    registration_date DATE
+);
+
+drop table if exists restaurants_2;
+CREATE TABLE restaurants_2 (
+    restaurant_id INT PRIMARY KEY,
+    restaurant_name VARCHAR(100) NOT NULL,
+    city VARCHAR(50),
+    cuisine VARCHAR(50),
+    rating DECIMAL(2,1)
+);
+
+drop table if exists delivery_agents_2;
+CREATE TABLE delivery_agents_2 (
+    agent_id INT PRIMARY KEY,
+    agent_name VARCHAR(100) NOT NULL,
+    city VARCHAR(50),
+    joining_date DATE
+);
+
+drop table if exists orders_2;
+CREATE TABLE orders_2 (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    restaurant_id INT,
+    agent_id INT,
+    order_date DATETIME,
+    order_amount DECIMAL(10,2),
+    delivery_time_mins INT,
+    order_status VARCHAR(30),
+
+    FOREIGN KEY (customer_id)
+        REFERENCES customers_2(customer_id),
+
+    FOREIGN KEY (restaurant_id)
+        REFERENCES restaurants_2(restaurant_id),
+
+    FOREIGN KEY (agent_id)
+        REFERENCES delivery_agents_2(agent_id)
+);
+
+INSERT INTO customers_2 VALUES
+(1, 'Rahul Sharma', 'Mumbai', '9876543210', '2025-01-10'),
+(2, 'Priya Patel', 'Pune', '9876543211', '2025-02-15'),
+(3, 'Amit Verma', 'Hyderabad', '9876543212', '2025-03-20'),
+(4, 'Sneha Joshi', 'Mumbai', '9876543213', '2025-04-12'),
+(5, 'Karan Mehta', 'Pune', '9876543214', '2025-05-18'),
+(6, 'Neha Singh', 'Hyderabad', '9876543215', '2025-06-22'),
+(7, 'Rohit Kumar', 'Mumbai', '9876543216', '2025-07-10'),
+(8, 'Anjali Desai', 'Pune', '9876543217', '2025-08-14'),
+(9, 'Vikas Rao', 'Hyderabad', '9876543218', '2025-09-19'),
+(10, 'Pooja Shah', 'Mumbai', '9876543219', '2025-10-25');
+
+INSERT INTO restaurants_2 VALUES
+(101, 'Spice Garden', 'Mumbai', 'Indian', 4.5),
+(102, 'Pizza Palace', 'Mumbai', 'Italian', 4.2),
+(103, 'Burger Hub', 'Mumbai', 'Fast Food', 4.0),
+(104, 'Tandoori House', 'Pune', 'North Indian', 4.6),
+(105, 'South Spice', 'Pune', 'South Indian', 4.3),
+(106, 'Cafe Delight', 'Pune', 'Cafe', 4.1),
+(107, 'Biryani Express', 'Hyderabad', 'Biryani', 4.7),
+(108, 'Paradise Kitchen', 'Hyderabad', 'Indian', 4.5),
+(109, 'Dosa Corner', 'Hyderabad', 'South Indian', 4.2),
+(110, 'Chinese Wok', 'Mumbai', 'Chinese', 4.0);
+
+INSERT INTO delivery_agents_2 VALUES
+(201, 'Suresh Patil', 'Mumbai', '2024-01-10'),
+(202, 'Ramesh Kumar', 'Pune', '2024-02-15'),
+(203, 'Ajay Singh', 'Hyderabad', '2024-03-20'),
+(204, 'Vijay Sharma', 'Mumbai', '2024-04-12'),
+(205, 'Manoj Verma', 'Pune', '2024-05-18'),
+(206, 'Deepak Rao', 'Hyderabad', '2024-06-22'),
+(207, 'Nitin Shah', 'Mumbai', '2024-07-10'),
+(208, 'Arjun Mehta', 'Pune', '2024-08-14'),
+(209, 'Kishore Reddy', 'Hyderabad', '2024-09-19'),
+(210, 'Sameer Joshi', 'Mumbai', '2024-10-25');
+
+INSERT INTO orders_2 VALUES
+(1001, 1, 101, 201, NOW() - INTERVAL 1 DAY, 1200, 32, 'Delivered'),
+(1002, 2, 104, 202, NOW() - INTERVAL 2 DAY, 1800, 40, 'Delivered'),
+(1003, 3, 107, 203, NOW() - INTERVAL 3 DAY, 2500, 35, 'Delivered'),
+(1004, 4, 102, 204, NOW() - INTERVAL 4 DAY, 900, 28, 'Delivered'),
+(1005, 5, 105, 205, NOW() - INTERVAL 5 DAY, 1500, 42, 'Delivered'),
+
+(1006, 1, 101, 207, NOW() - INTERVAL 6 DAY, 2200, 30, 'Delivered'),
+(1007, 6, 108, 206, NOW() - INTERVAL 7 DAY, 3000, 38, 'Delivered'),
+(1008, 7, 103, 201, NOW() - INTERVAL 8 DAY, 700, 25, 'Delivered'),
+(1009, 8, 104, 208, NOW() - INTERVAL 9 DAY, 1600, 45, 'Delivered'),
+(1010, 9, 107, 209, NOW() - INTERVAL 10 DAY, 2800, 33, 'Delivered'),
+
+(1011, 2, 104, 202, NOW() - INTERVAL 11 DAY, 2100, 37, 'Delivered'),
+(1012, 3, 107, 203, NOW() - INTERVAL 12 DAY, 1900, 31, 'Delivered'),
+(1013, 4, 101, 204, NOW() - INTERVAL 13 DAY, 1400, 29, 'Delivered'),
+(1014, 5, 105, 205, NOW() - INTERVAL 14 DAY, 2500, 41, 'Delivered'),
+(1015, 6, 108, 206, NOW() - INTERVAL 15 DAY, 1800, 36, 'Delivered'),
+
+(1016, 7, 101, 207, NOW() - INTERVAL 16 DAY, 1300, 27, 'Delivered'),
+(1017, 8, 104, 208, NOW() - INTERVAL 17 DAY, 1700, 39, 'Delivered'),
+(1018, 9, 107, 209, NOW() - INTERVAL 18 DAY, 2200, 34, 'Delivered'),
+(1019, 10, 102, 210, NOW() - INTERVAL 19 DAY, 1100, 30, 'Delivered'),
+(1020, 1, 101, 201, NOW() - INTERVAL 20 DAY, 2000, 32, 'Delivered'),
+
+(1021, 2, 104, 202, NOW() - INTERVAL 21 DAY, 1900, 43, 'Delivered'),
+(1022, 3, 107, 203, NOW() - INTERVAL 22 DAY, 2600, 35, 'Delivered'),
+(1023, 4, 102, 204, NOW() - INTERVAL 23 DAY, 1500, 29, 'Delivered'),
+(1024, 5, 105, 205, NOW() - INTERVAL 24 DAY, 2300, 40, 'Delivered'),
+(1025, 6, 108, 206, NOW() - INTERVAL 25 DAY, 2100, 37, 'Delivered');
+select * from customers_2;
+select * from restaurants_2;
+select * from orders_2;
+select * from delivery_agents_2;
+
+/*
+-Write a revenue report query using GROUP BY, HAVING, and aggregate functions (SUM, COUNT,
+AVG) that returns total orders and total revenue per restaurant, filtered to include only
+restaurants with more than 3 orders.
+*/
+select 
+	r.restaurant_id,
+    r.restaurant_name,
+    count(o.order_id)as total_orders,
+    round(sum(o.order_amount),2)as total_revenue,
+    round(avg(o.order_amount),2)as avg_revenue
+from restaurants_2 as r
+inner join orders_2 as o
+on r.restaurant_id = o.restaurant_id
+where o.order_status = "Delivered"
+group by r.restaurant_id,r.restaurant_name
+having total_orders > 3
+order by total_revenue desc;
     
+/*
+-  Write a customer segmentation query using CASE WHEN to classify each customer as
+'Platinum' (spend above Rs 5,000), 'Gold' (Rs 2,000–Rs 5,000), or 'Standard' (below Rs 2,000)
+based on their total spend, ordered from highest to lowest spender.
+*/
+select * from orders_2;
+select * from customers_2;
+
+with cte_cst_spent as (
+select
+	c.customer_id,
+	c.customer_name,
+	count(o.order_id)as total_order,
+    sum(o.order_amount) as total_spent
+from customers_2 as c
+left join orders_2 as o
+on c.customer_id = o.customer_id
+group by c.customer_id,
+c.customer_name
+)
+
+select 
+	customer_id,
+    customer_name,
+    total_order,
+    total_spent,
+    case total_spent
+		when total_spent > 5000 then "Platinum"
+        when total_spent between 2000 and 5000 then "Gold"
+        else "Standard"
+	end as revenue_report
+    from cte_cst_spent;
+		
+/*
+Write a window function query using DENSE_RANK() OVER (PARTITION BY city ORDER BY
+total_revenue DESC) to identify the top 3 performing restaurants in each city, and a separate
+query using ROW_NUMBER() to find each customer's single most recent order.
+*/  
+select * from restaurants_2;
+select * from orders_2;
+
+with cte_restaurant_revenue as (
+	select
+		r.restaurant_id,
+		r.restaurant_name,
+		r.city,
+		r.cuisine,
+		count(o.order_id)as total_orders,
+		sum(o.order_amount) as total_revenue
+	from restaurants_2 as r
+	left join orders_2 as o
+	on r.restaurant_id = o.restaurant_id
+	group by r.restaurant_id,
+		r.restaurant_name,
+		r.city
+),
+cte_restaurant_ranking  as (
+	select
+		restaurant_id,
+		city,
+        restaurant_name,
+        cuisine,
+        total_orders,
+        total_revenue,
+        dense_rank()over(partition by city order by total_revenue desc)as revenue_rank
+        from cte_restaurant_revenue
+)
+select * from cte_restaurant_ranking where  revenue_rank <= 3 order by city, revenue_rank;
+
+#a separate query using ROW_NUMBER() to find each customer's single most recent order.
+select * from orders_2;
+select * from customers_2;
+
+with cte_cst_orders as(
+	select
+		c.customer_id,
+		c.customer_name,
+		o.order_id,
+		o.order_date,
+		o.order_amount,
+		o.order_status,
+		row_number()over(partition by c.customer_id order by o.order_date desc,o.order_id desc)as rn
+	from customers_2 as c
+	inner join orders_2 as o
+	on c.customer_id = o.customer_id
+)
+
+select 
+	customer_id, 
+    order_id,
+    customer_name,
+    order_date,
+    order_amount,
+    order_status,
+    rn
+	from cte_cst_orders where rn = 1
+    order by order_date desc;
+    
+/*
+- Create a SQL VIEW named vw_daily_order_summary that JOINs all four tables and returns:
+order_date, customer_name, restaurant_name, agent_name, order_amount, and
+delivery_time_mins. Query the view to display only orders placed in the last 7 days.
+*/
+
+ create view vw_daily_order_summary as 
+	select
+		o.order_date,
+		c.customer_name,
+        r.restaurant_name,
+        da.agent_name,
+        o.order_amount,
+        o.delivery_time_mins
+		
+        from orders_2 as o
+        inner join customers_2 as c
+        on c.customer_id = o.customer_id
+        inner join restaurants_2 as r
+        on o.restaurant_id = r.restaurant_id
+        inner join delivery_agents_2 as da
+        on o.agent_id = da.agent_id;
+        
+
+SELECT *
+FROM vw_daily_order_summary
+WHERE order_date >= NOW() - INTERVAL 7 DAY
+  AND order_date <= NOW()
+ORDER BY order_date DESC;
+
+#=============================================================================================================================================================
+#==================================================== Section D — AI-Augmented Learning ======================================================================
+#=============================================================================================================================================================
+
+/*
+STEP 1 · BUILD WITH AI
+Use an AI tool of your choice (ChatGPT, Claude, GitHub Copilot, etc.) to help you write a SQL query
+that:
+Finds the top 3 delivery agents per city for a food delivery platform, ranked by number of
+completed orders, using window functions.
+Includes a column showing each agent's average delivery time alongside their rank.
+Filters the result to include only agents who have completed more than 5 orders in that city.
+Returns the final output sorted by city name alphabetically, then by rank ascending.
+
+STEP 2 · TEST & DEBUG (WITHOUT AI)
+Then, working without AI, test the query against your own schema. Find at least one bug, logical
+error, or edge-case gap in the AI's solution — common issues include: applying the
+HAVING/WHERE filter after ranking instead of before (causing wrong ranks), using the wrong
+PARTITION BY column, or failing to handle NULL delivery times. Fix it yourself.
+
+
+
+*/
