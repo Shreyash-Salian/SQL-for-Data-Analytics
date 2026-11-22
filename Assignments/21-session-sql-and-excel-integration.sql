@@ -1,3 +1,4 @@
+
 #===================================================================================================================================================================
 #================================================= SESSION 21 : SQL + EXCEL INTEGRATION ============================================================================
 #====================================================================================================================================================================
@@ -147,5 +148,14 @@ Step 8: Refresh and verify
 = Click:
   - Data → Refresh All
 
+*/
+/*
+3.Build a sheet `Dashboard` in `recharge_dashboard.xlsx` with a PivotTable from the `circle_summary` 
+query and one PivotChart showing churned subscribers by circle, with a clear title. The chart must update 
+when the data is refreshed. Constraint: Do not use macros or VBA; use built-in refresh features only.
+
+4.Finish `recharge_dashboard.xlsx` by running `recharge_new_rows.sql`, a script you write that inserts 20 new subscribers (S0201 to S0220) 
+into MySQL, and turn on 'Refresh data when opening the file' in the connection properties. 
+Close and reopen the workbook and check that the dashboard now shows 220 subscribers in total.</p>
 
 */
